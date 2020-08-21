@@ -47,6 +47,7 @@ def main():
     import config
     import requests
     import json
+    import time
     bot = telebot.TeleBot(config.telegram_token)
     chat_id = config.tg_chat_id
     
@@ -71,6 +72,7 @@ def main():
 
             text = '[%s](https://vk.com/%s?z=photo%s_%s), %s' % (vk_name, vk_domain, vk_id, photo_id, album_id)
             bot.send_photo(chat_id, photo_url, caption=text, parse_mode='MarkdownV2')
+            time.sleep(5)
    
     with open('data.json', 'w') as file:
         json.dump(data, file)
