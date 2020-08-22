@@ -4,13 +4,11 @@ def get_last_photos(vk_id, album, vk_token, api_version, last_date=0):
     import math
 
     photo_list = []
-    photo_dic = {'id': vk_id, 'contents': photo_list, 'date': 0}
+    photo_dic = {'id': vk_id, 'contents': photo_list}
     payload = {'owner_id': vk_id, 'album_id': album, 'count': 1, 'rev': 1, 'access_token': vk_token, 'v': api_version}
     r = requests.get('https://api.vk.com/method/photos.get', params=payload)
     r_json = json.loads(r.text)
     photos_count = r_json['response']['count']
-    new_last_date = r_json['response']['items'][0]['date']
-    photo_dic['date'] = new_last_date
 
     for sen in range(math.ceil(photos_count / 1000)):
         payload['count'] = 1000
@@ -22,7 +20,8 @@ def get_last_photos(vk_id, album, vk_token, api_version, last_date=0):
             if new_date > last_date:
                 photo_url = photo['sizes'][-1]['url']
                 photo_id = photo['id']
-                photo_list.append({'url': photo_url, 'id': photo_id})
+                if photo_url is not None:
+                    photo_list.append({'url': photo_url, 'id': photo_id, 'date': new_date})
             else:
                 return(photo_dic)
     return(photo_dic)
@@ -60,8 +59,6 @@ def main():
 
         photo_dic = get_last_photos(vk_id, album_id, config.vk_token, config.api_version, last_date=album['last_date'])
         photo_list = photo_dic['contents']
-        last_date = photo_dic['date']
-        album['last_date'] = last_date
         vk_user = get_user_name(vk_id, config.vk_token, config.api_version)
         vk_name = vk_user['name']
         vk_domain = vk_user['domain']
@@ -69,14 +66,19 @@ def main():
         for photo in reversed(photo_list):
             photo_url = photo['url']
             photo_id = photo['id']
-
+            photo_date = photo['date']
             text = '[%s](https://vk.com/%s?z=photo%s_%s), %s' % (vk_name, vk_domain, vk_id, photo_id, album_id)
-            bot.send_photo(chat_id, photo_url, caption=text, parse_mode='MarkdownV2')
-            time.sleep(5)
+            try:
+                bot.send_photo(chat_id, photo_url, caption=text, parse_mode='MarkdownV2')
+            except telebot.apihelper.ApiException:
+                print('[400] %s' % (photo_url))
+            else: 
+                last_date = photo_date
+                album['last_date'] = last_date
+                with open('data.json', 'w') as file:
+                    json.dump(data, file)
+            time.sleep(4)
    
-    with open('data.json', 'w') as file:
-        json.dump(data, file)
-        
 
 if __name__ == '__main__':
     main()
