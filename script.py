@@ -41,6 +41,12 @@ def get_user_name(vk_id, vk_token, api_version):
     return({'name': full_name, 'domain': domain})
 
 
+def write_log(text):
+    with open('log.txt', 'a+') as file:
+        file.write(text)
+    print(text)
+
+
 def main():
     import telebot
     import config
@@ -71,8 +77,9 @@ def main():
             try:
                 bot.send_photo(chat_id, photo_url, caption=text, parse_mode='MarkdownV2')
             except telebot.apihelper.ApiException:
-                print('[400] %s' % (photo_url))
-            else: 
+                write_log('[400] %s' % (photo_url))
+            else:
+                write_log('[SUCC] %s' % (text))
                 last_date = photo_date
                 album['last_date'] = last_date
                 with open('data.json', 'w') as file:
@@ -81,4 +88,7 @@ def main():
    
 
 if __name__ == '__main__':
-    main()
+    import time
+    while True:
+        main()
+        time.sleep(300)
