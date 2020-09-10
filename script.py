@@ -43,7 +43,7 @@ def get_user_name(vk_id, vk_token, api_version):
 
 def write_log(text):
     with open('log.txt', 'a+') as file:
-        file.write(text)
+        file.write("%s\n" % text)
     print(text)
 
 
@@ -90,5 +90,6 @@ def main():
 if __name__ == '__main__':
     import time
     while True:
+
         main()
         time.sleep(300)
