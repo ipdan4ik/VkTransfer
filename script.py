@@ -89,7 +89,10 @@ def main():
 
 if __name__ == '__main__':
     import time
+    import requests
     while True:
-
-        main()
+        try:
+            main()
+        except requests.exceptions.ConnectionError:
+            write_log('[ERR] Connection error')
         time.sleep(300)
