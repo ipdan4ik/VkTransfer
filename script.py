@@ -95,4 +95,8 @@ if __name__ == '__main__':
             main()
         except requests.exceptions.ConnectionError:
             write_log('[ERR] Connection error')
-        time.sleep(300)
+            time.sleep(240)
+        except Exception as e:
+            write_log('[ERR] %s' % (e))
+            time.sleep(3540)
+        time.sleep(60)
