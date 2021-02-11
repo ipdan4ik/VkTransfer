@@ -47,15 +47,7 @@ def write_log(text):
     print(text)
 
 
-def main():
-    import telebot
-    import config
-    import requests
-    import json
-    import time
-    bot = telebot.TeleBot(config.telegram_token)
-    chat_id = config.tg_chat_id
-    
+def main(bot):
     with open('data.json', 'r') as file:
         data = json.load(file)
 
@@ -88,11 +80,18 @@ def main():
    
 
 if __name__ == '__main__':
+    import telebot
+    import config
+    import requests
+    import json
+    import time
     import time
     import requests
+    bot = telebot.TeleBot(config.telegram_token)
+    chat_id = config.tg_chat_id
     while True:
         try:
-            main()
+            main(bot)
         except requests.exceptions.ConnectionError:
             write_log('[ERR] Connection error')
             time.sleep(240)
